@@ -25,9 +25,10 @@
 	$users = [];
 
 	
-	$messages = $telegramClient->getChannelUsers('javascript_jobs', 0, 100);
+	$messages = $telegramClient->getChannelUsers($channel, 0, 100);
 
 	echo 'Скрипт был выполнен за ' . (microtime(true) - $startScript) . ' секунд';
+	//vardump($messages);
 ?>
 
 <html>
@@ -86,6 +87,24 @@ function getArrayKey($key, $arr) {
 		return $arr[$key];
 	}
 	return '';
+}
+
+/**
+ * Функция выводит массив на экран
+ * param  $arr  Array Массив данных
+ * param  $var_dump Bool Если true, то выводит в массиве и типы данных
+ * Void
+ */
+function vardump($arr, $var_dump = false)
+{
+  echo "<pre style='background: #222;color: #54ff00;padding: 20px;'>";
+  if ($var_dump){
+    var_dump($arr);
+  }
+  else{
+    print_r($arr);
+  }
+  echo "</pre>";
 }
 
 ?>

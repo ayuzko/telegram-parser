@@ -18,7 +18,7 @@ class TelegramClient {
 
     $settings['connection_settings']['all']['proxy'] = HttpProxy::getName();
     $settings['connection_settings']['all']['proxy_extra'] = [
-        'address'  => '159.203.81.37',
+        'address'  => '149.28.52.218',
         'port'     =>  8080
     ];
 
