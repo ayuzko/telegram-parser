@@ -52,3 +52,7 @@ tr td:last-child {
 textarea {
   width: 100%;
 } */
+
+.table td {
+  word-break: break-all;
+}

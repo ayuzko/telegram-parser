@@ -18,8 +18,8 @@ class TelegramClient {
 
     $settings['connection_settings']['all']['proxy'] = HttpProxy::getName();
     $settings['connection_settings']['all']['proxy_extra'] = [
-        'address'  => '149.28.52.218',
-        'port'     =>  8080
+        'address'  => '51.158.111.229',
+        'port'     =>  8811
     ];
 
 
@@ -51,6 +51,26 @@ class TelegramClient {
       $users['result'] = 'Ошибка ' . $th->getMessage();
     }
     return $users;
+  }
+
+  public function getFullChannelInfo($channel) {
+    $result = [
+      'status' => 'ok', 
+      'result' => array()
+    ];
+
+    try {
+      $result['result'] = $this->MadelineProto->get_pwr_chat($channel);
+
+      if (array_key_exists('participants', $result['result'])) {
+        $users = array_column($result['result']['participants'], 'user');
+        $result['result'] = array('users' => $users);
+      }
+    } catch (\Throwable $th) {
+      $result['status'] = 'error';
+      $result['result'] = 'Ошибка ' . $th->getMessage();
+    }
+    return $result;
   }
 
   public function subscribeToChannel($channel, $users) {

@@ -5,7 +5,7 @@
 
 	include (__DIR__ . '/TelegramClient.php');
 	$startScript = microtime(true);
-
+	$currentTime = time();
 
 	$telegramClient = new TelegramClient();
 
@@ -25,10 +25,12 @@
 	$users = [];
 
 	
-	$messages = $telegramClient->getChannelUsers($channel, 0, 100);
+	 //$messages = $telegramClient->getChannelUsers($channel, 0, 100);
+	$messages = $telegramClient->getFullChannelInfo($channel);
 
 	echo 'Скрипт был выполнен за ' . (microtime(true) - $startScript) . ' секунд';
 	//vardump($messages);
+//	return;
 ?>
 
 <html>
@@ -52,10 +54,20 @@
 								<th scope="col">first name</th>
 								<th scope="col">last name</th>
 								<th scope="col">phone</th>
+								<th scope="col">Заходил последний раз (часы)</th>
+								<th scope="col">Это бот</th>
 							</tr>
 						<thead>
 						<tbody>
 							<? foreach ($messages['result']['users'] as $row) { ?>
+								<?
+								$hours = '';
+								if (array_key_exists('status', $row)) {
+									if (array_key_exists('was_online', $row['status'])) {
+										$hours = countHoursBetweenDates($currentTime, getArrayKey('was_online', $row['status']));
+									}									
+								}
+								?>
 								<tr>
 									<th scope="row"><?= $count++; ?></th>
 									<td><?= getArrayKey('id', $row); ?></td>
@@ -64,6 +76,9 @@
 									<td><?= getArrayKey('first_name', $row); ?></td>
 									<td><?= getArrayKey('last_name', $row); ?></td>
 									<td><?= getArrayKey('phone', $row); ?></td>
+									<td><?= $hours; ?></td>
+									<td><?= getArrayKey('bot', $row); ?></td>
+									
 									<?
 									if ($photo == true) {
 										$telegramClient->getUserPhoto($row['id'], '/home/user/Загрузки/1/');
@@ -105,6 +120,14 @@ function vardump($arr, $var_dump = false)
     print_r($arr);
   }
   echo "</pre>";
+}
+
+function countHoursBetweenDates($firsDate, $secondDate) {
+	$currentDate = $firsDate;
+	$statusDate = $secondDate;
+	$seconds = abs($currentDate - $statusDate);
+	$hours = floor($seconds / 3600);
+	return $hours;
 }
 
 ?>
