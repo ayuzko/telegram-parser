@@ -23,8 +23,8 @@ class TelegramClient {
         'address'  => '40.67.219.227',
         'port'     =>  3128
     ];
-    $settings['app_info']['api_id'] = '1082070';
-    $settings['app_info']['api_hash'] = '3578ffef93bf3f9d434245ee0559032c';
+    $settings['app_info']['api_id'] = '';
+    $settings['app_info']['api_hash'] = '';
 
 
     $this->MadelineProto = new \danog\MadelineProto\API('session.madeline', $settings);
