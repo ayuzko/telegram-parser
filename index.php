@@ -30,6 +30,33 @@
 							<input class="form-check-input" type="checkbox" name="photo" value="true" id="photo">
 							<label class="form-check-label" for="photo">Получить фото пользователей канала</label>
 						</div>
+						<fieldset class="form-group border p-2">
+							<legend class="w-auto">Выберите тип участников</legend>
+							<div class="custom-control custom-radio">
+								<input class="custom-control-input" type="radio" name="users_type" value="users" id="r_users" checked>
+								<label class="custom-control-label" for="r_users">
+									Участники
+								</label>
+							</div>
+							<div class="custom-control custom-radio">
+								<input class="custom-control-input" type="radio" name="users_type" value="admins" id="r_admins">
+								<label class="custom-control-label" for="r_admins">
+									Админы
+								</label>
+							</div>
+							<div class="custom-control custom-radio">
+								<input class="custom-control-input" type="radio" name="users_type" value="bots" id="r_bots">
+								<label class="custom-control-label" for="r_bots">
+									Боты
+								</label>
+							</div>
+							<div class="custom-control custom-radio">
+								<input class="custom-control-input" type="radio" name="users_type" value="all" id="r_all">
+								<label class="custom-control-label" for="r_all">
+									Все
+								</label>
+							</div>
+						</fieldset>
 					</div>
 					<button class="btn btn-primary btn-sm" type="submit">Выполнить</button>
 				</form>		
@@ -40,7 +67,7 @@
 			<div class="col">
 				<form action="mybot/subscribe_to_channel.php" method="post">
 					<div class="form-group">
-						<h1>Канала/группа/чат для подписи</h1>
+						<h1>Инвайт пользователей в группу/канал</h1>
 						<div class="">
 							<label>Телеграм-канал:</label>
 							<input class="form-control form-control-sm" type="text" name="channel" value="javascript_jobs" placeholder="Введите название группы/канала/чата в формате https://t.me/offers_banggood или offers_banggood">
@@ -51,6 +78,48 @@
 						</div>
 					</div>
 					<button class="btn btn-primary btn-sm" type="submit">Подписать пользователей</button>
+				</form>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col">
+				<form action="mybot/send_message.php" method="post">
+					<div class="form-group">
+						<h1>Рассылка нового сообщения</h1>
+						<div class="">
+							<label>Список получателей:</label>
+							<textarea class="form-control form-control-sm" type="text" name="recipients" cols="10" rows="10" value="" placeholder="Введите получетелей, каждый с новой строки в одном из форматов @username, username, id пользоватля, https://t.me/joinchat/*, https://t.me/*"></textarea>
+						</div>
+						<div>
+							<label>Сообщение: </label>
+							<textarea class="form-control form-control-sm" name="message_text" id="" cols="10" rows="10" placeholder="Введите сообщение, поддерживается разметка markdown"></textarea>
+						</div>
+					</div>
+					<button class="btn btn-primary btn-sm" type="submit">Отправить сообщение</button>
+				</form>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col">
+				<form action="mybot/forward_message.php" method="post">
+					<div class="form-group">
+						<h1>Перессылка сообщений</h1>
+						<div class="">
+							<label>Источник сообщений (от куда надо взять):</label>
+							<input class="form-control form-control-sm" type="text" name="source" value="" placeholder="Введите источник сообщений в одном из форматов @username, username, id пользоватля, https://t.me/joinchat/*, https://t.me/*"></input>
+						</div>
+						<div class="">
+							<label>Получатель сообщений (куда надо переслать):</label>
+							<input class="form-control form-control-sm" type="text" name="recipient" value="" placeholder="Введите получателя сообщений в одном из форматов @username, username, id пользоватля, https://t.me/joinchat/*, https://t.me/*"></input>
+						</div>
+						<div>
+							<label>Сообщения id: </label>
+							<textarea class="form-control form-control-sm" name="message_ids" id="" cols="10" rows="10" placeholder="Введите id сообщений, каждый id на новой строке"></textarea>
+						</div>
+					</div>
+					<button class="btn btn-primary btn-sm" type="submit">Переслать сообщения</button>
 				</form>
 			</div>
 		</div>

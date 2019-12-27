@@ -23,9 +23,9 @@ if (array_key_exists('channel', $_POST)) {
 }
 
 $telegramClient = new TelegramClient();
-$result = $telegramClient->subscribeToChannel($channel, $arUserId);
+//$result = $telegramClient->subscribeToChannel($channel, $arUserId);
 $a = 0;
-
+$count = 0;
 
 /**
  * Функция выводит массив на экран
@@ -61,15 +61,37 @@ function vardump($arr, $var_dump = false)
   <div class="container">
     <div class="row">
       <div class="col">
-        <? if ($result['status'] == 'ok') { ?>
-          <div class="alert alert-success" role="alert">
-            Пользователи подписаны успешно.
-          </div>
-        <? } else { ?>
-          <div class="alert alert-danger" role="alert">
-            <?= $result['result']; ?>
-          </div>
-        <? } ?>
+
+        <table class="table table-dark table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">username</th>
+              <th scope="col">status</th>
+            </tr>
+          <thead>
+          <tbody>
+            
+            <? foreach ($arUserId as $userId) {
+              
+              $result = $telegramClient->subscribeToChannel($channel, array($userId));
+              // if ($result['status'] == 'ok') {
+              //   continue;
+              // }
+
+              ?>
+
+              <tr>
+                <th scope="row"><?= $count++; ?></th>
+                <td><?= $userId; ?></td>
+                <td><?= $result['status'] == 'ok' ? 'ok' : $result['result']; ?></td>
+              </tr>
+
+              <? sleep(120); ?>
+            <? } ?>
+            
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

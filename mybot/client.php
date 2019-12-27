@@ -9,9 +9,10 @@
 
 	$telegramClient = new TelegramClient();
 
-	$count = 0;
+	$count = 1;
 	$channel = '';
 	$photo = '';
+	$usersType = 'channelParticipantsRecent';
 
 	if (array_key_exists('channel', $_POST)) {
 		$channel = $_POST['channel'];
@@ -21,16 +22,44 @@
 		$photo = $_POST['photo'];
 	}
 
+	if (array_key_exists('users_type', $_POST)) {
+		$usersType = $_POST['users_type'];
+		switch ($usersType) {
+			case 'admins':
+				$usersType = 'channelParticipantsAdmins';			
+				break;
+			
+			case 'bots':
+				$usersType = 'channelParticipantsBots';
+				break;
+			
+			case 'all':
+				$usersType = 'channelParticipantsAll'; // кастомный тип данных 
+				break;
+
+			default:
+				$usersType = 'channelParticipantsRecent';
+				break;
+		}
+	}
+
 	$messages = [];
 	$users = [];
 
+	if ($usersType == 'channelParticipantsAll') {
+		$messages = $telegramClient->getFullChannelInfo($channel);
+	} else {
+		$messages = $telegramClient->getChannelUsersFull($channel, $usersType);
+	}
 	
-	 //$messages = $telegramClient->getChannelUsers($channel, 0, 100);
-	$messages = $telegramClient->getFullChannelInfo($channel);
+	$me = $telegramClient->getMe();
+	$firstName = getArrayKey('first_name', $me['result']);
+	$lastName = getArrayKey('last_name', $me['result']);
+	$userName = getArrayKey('username', $me['result']);
 
-	echo 'Скрипт был выполнен за ' . (microtime(true) - $startScript) . ' секунд';
-	//vardump($messages);
-//	return;
+	//vardump($me);
+	//return;
+	
 ?>
 
 <html>
@@ -44,17 +73,42 @@
 		<div class="container">
 			<div class="row">
 				<div class="col">
+					<p class="text-left">
+						<? echo 'Скрипт был выполнен за ' . (microtime(true) - $startScript) . ' секунд'; ?>
+					</p>
+					
+					<div>
+						<a class="btn btn-primary" href="/" role="button">вернуться назад</a>
+					</div>
+
+					<dl class="row">
+						<dt class="col-sm-3">Полное имя</dt>
+  					<dd class="col-sm-9"><?= $firstName . ' ' . $lastName; ?></dd>
+
+						<dt class="col-sm-3">Группа</dt>
+  					<dd class="col-sm-9"><?= $channel; ?></dd>
+
+						<dt class="col-sm-3">Username</dt>
+  					<dd class="col-sm-9"><?= $userName; ?></dd>
+					</dl>
+
+					<? if ($messages['status'] == 'error') { ?>
+						<div class="alert alert-danger" role="alert">
+							<?= $messages['result']; ?>
+						</div>
+					<? } ?>
+					
 					<table class="table table-dark table-striped">
 						<thead>
 							<tr>
 								<th scope="col">#</th>
 								<th scope="col">id</th>
-								<th scope="col">access hash</th>
+								<!-- <th scope="col">access hash</th> -->
 								<th scope="col">username</th>
 								<th scope="col">first name</th>
 								<th scope="col">last name</th>
-								<th scope="col">phone</th>
-								<th scope="col">Заходил последний раз (часы)</th>
+								<!-- <th scope="col">phone</th> -->
+								<th scope="col">Последний вход<br>(часы)</th>
 								<th scope="col">Это бот</th>
 							</tr>
 						<thead>
@@ -71,13 +125,13 @@
 								<tr>
 									<th scope="row"><?= $count++; ?></th>
 									<td><?= getArrayKey('id', $row); ?></td>
-									<td><?= getArrayKey('access_hash', $row); ?></td>
+									<!-- <td><?= getArrayKey('access_hash', $row); ?></td> -->
 									<td><?= getArrayKey('username', $row); ?></td>
-									<td><?= getArrayKey('first_name', $row); ?></td>
+									<td class="overflow-hidden"><?= getArrayKey('first_name', $row); ?></td>
 									<td><?= getArrayKey('last_name', $row); ?></td>
-									<td><?= getArrayKey('phone', $row); ?></td>
+									<!-- <td><?= getArrayKey('phone', $row); ?></td> -->
 									<td><?= $hours; ?></td>
-									<td><?= getArrayKey('bot', $row); ?></td>
+									<td><?= getUserType($row); ?></td>
 									
 									<?
 									if ($photo == true) {
@@ -128,6 +182,18 @@ function countHoursBetweenDates($firsDate, $secondDate) {
 	$seconds = abs($currentDate - $statusDate);
 	$hours = floor($seconds / 3600);
 	return $hours;
+}
+
+function getUserType($row) {
+	if (array_key_exists('type', $row)) {
+		return $row['type'];
+	}
+
+	if (array_key_exists('bot', $row)) {
+		return $row['bot'];
+	}
+
+	return '';
 }
 
 ?>

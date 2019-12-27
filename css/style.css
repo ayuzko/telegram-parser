@@ -53,6 +53,15 @@ textarea {
   width: 100%;
 } */
 
+.table {
+  table-layout: fixed;
+}
+
 .table td {
   word-break: break-all;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+  white-space: nowrap;
 }
