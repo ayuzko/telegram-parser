@@ -20,11 +20,11 @@ class TelegramClient {
     $settings['connection_settings']['all']['proxy_extra'] = [
         // 'address'  => '51.158.120.84',
         // 'port'     =>  8811
-        'address'  => '40.67.219.227',
+        'address'  => '51.91.212.159',
         'port'     =>  3128
     ];
-    $settings['app_info']['api_id'] = '';
-    $settings['app_info']['api_hash'] = '';
+    $settings['app_info']['api_id'] = '1082070';
+    $settings['app_info']['api_hash'] = '3578ffef93bf3f9d434245ee0559032c';
 
 
     $this->MadelineProto = new \danog\MadelineProto\API('session.madeline', $settings);
@@ -62,6 +62,45 @@ class TelegramClient {
     try {
       $me = $this->MadelineProto->getSelf();
       $result['result'] = $me;
+    } catch (\Throwable $th) {
+      $result['status'] = 'error';
+      $result['result'] = 'Ошибка ' . $th->getMessage();
+    }
+    return $result;
+  }
+
+  public function deleteMessage($channel, $idMessage) {
+    $result = [
+      'status' => 'ok', 
+      'result' => array()
+    ];
+    
+    try {
+      $result['result'] = $this->MadelineProto->channels->deleteMessages(['channel' => $channel, 'id' => $idMessage]);
+    } catch (\Throwable $th) {
+      $result['status'] = 'error';
+      $result['result'] = 'Ошибка ' . $th->getMessage();
+    }
+    return $result;
+  }
+
+  public function getMassages($peer, $offsetId = 0, $offsetDate = 0, $addOffset = 0, $limit = 200, $maxId = 0, $minId = 0, $hash = []) {
+    $result = [
+      'status' => 'ok', 
+      'result' => array()
+    ];
+
+    try {
+      $result['result'] = $this->MadelineProto->messages->getHistory([
+        'peer' => $peer, 
+        'offset_id' => $offsetId,     // Возвращать только сообщения, начиная с указанного идентификатора сообщения
+        'offset_date' => $offsetDate, // Вернуть только сообщения, отправленные после указанной даты 
+        'add_offset' => $addOffset,   // Количество пропускаемых элементов списка, также допускаются отрицательные значения. 
+        'limit' => $limit,            // Количество результатов для возврата
+        'max_id' => $maxId,           // Если было передано положительное значение, метод будет возвращать только сообщения с идентификаторами меньше max_id
+        'min_id' => $minId,           // Если было передано положительное значение, метод будет возвращать только сообщения с идентификаторами, превышающими min_id
+        'hash' => $hash               // Идентификаторы сообщений, которые вы уже получили, необязательный
+      ]);
     } catch (\Throwable $th) {
       $result['status'] = 'error';
       $result['result'] = 'Ошибка ' . $th->getMessage();

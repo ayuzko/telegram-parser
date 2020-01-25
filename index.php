@@ -123,6 +123,21 @@
 				</form>
 			</div>
 		</div>
+
+		<div class="row">
+			<div class="col">
+				<form action="mybot/delete_message.php" method="post">
+					<div class="form-group">
+						<h1>Очистить канал от сообщений</h1>
+						<div class="">
+							<label>Источник сообщений:</label>
+							<input class="form-control form-control-sm" type="text" name="source" value="" placeholder="Введите источник сообщений в одном из форматов @username, username, id пользоватля, https://t.me/joinchat/*, https://t.me/*"></input>
+						</div>
+					</div>
+					<button class="btn btn-primary btn-sm" type="submit">Очистить</button>
+				</form>
+			</div>
+		</div>
 	</div>
 
 	<div class="errors-wrapper" style="color: red; display: none"></div>
