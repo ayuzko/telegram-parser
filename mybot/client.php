@@ -107,7 +107,7 @@
 								<th scope="col">username</th>
 								<th scope="col">first name</th>
 								<th scope="col">last name</th>
-								<!-- <th scope="col">phone</th> -->
+								<th scope="col">phone</th>
 								<th scope="col">Последний вход<br>(часы)</th>
 								<th scope="col">Это бот</th>
 							</tr>
@@ -126,10 +126,10 @@
 									<th scope="row"><?= $count++; ?></th>
 									<td><?= getArrayKey('id', $row); ?></td>
 									<!-- <td><?= getArrayKey('access_hash', $row); ?></td> -->
-									<td><?= getArrayKey('username', $row); ?></td>
+									<td>@<?= getArrayKey('username', $row); ?></td>
 									<td class="overflow-hidden"><?= getArrayKey('first_name', $row); ?></td>
 									<td><?= getArrayKey('last_name', $row); ?></td>
-									<!-- <td><?= getArrayKey('phone', $row); ?></td> -->
+									<td><?= getArrayKey('phone', $row); ?></td>
 									<td><?= $hours; ?></td>
 									<td><?= getUserType($row); ?></td>
 									

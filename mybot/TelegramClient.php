@@ -16,15 +16,15 @@ class TelegramClient {
   
     // если показывает что ошибка подключиния к DC5 или DC2, то включить прокси
 
-    $settings['connection_settings']['all']['proxy'] = HttpProxy::getName();
+    $settings['connection_settings']['all']['proxy'] = SocksProxy::getName();
     $settings['connection_settings']['all']['proxy_extra'] = [
         // 'address'  => '51.158.120.84',
         // 'port'     =>  8811
-        'address'  => '51.91.212.159',
-        'port'     =>  3128
+        'address'  => '96.113.166.133',
+        'port'     =>  1080
     ];
-    $settings['app_info']['api_id'] = '1082070';
-    $settings['app_info']['api_hash'] = '3578ffef93bf3f9d434245ee0559032c';
+    $settings['app_info']['api_id'] = '';
+    $settings['app_info']['api_hash'] = '';
 
 
     $this->MadelineProto = new \danog\MadelineProto\API('session.madeline', $settings);
@@ -33,8 +33,40 @@ class TelegramClient {
     //\danog\MadelineProto\Logger::log($me);
   }
 
-  public function getMessagesViews() {
+  public function getFullInfo($id) {
     $result = [
+      'status' => 'ok', 
+      'result' => array()
+    ];
+    try {
+      $result['result'] = $this->MadelineProto->getFullInfo($id);
+    } catch (\Throwable $th) {
+      $result['status'] = 'error';
+      $result['result'] = 'Ошибка ' . $th->getMessage();
+    }
+
+    return $result;
+  }
+
+  public function getMessagesById($channel, $idMessage, $massage) {
+    $result = [
+      'status' => 'ok', 
+      'result' => array()
+    ];
+    
+    try {
+      $messages = $this->MadelineProto->channels->getMessages(['channel' => $channel, 'id' => $idMessage]);
+      $result['result'] = $messages;
+    } catch (\Throwable $th) {
+      $result['status'] = 'error';
+      $result['result'] = 'Ошибка ' . $th->getMessage();
+    }
+
+    return $result;
+  }
+
+  public function getMessagesViews() {
+    /*$result = [
       'status' => 'ok', 
       'result' => array()
     ];
@@ -48,10 +80,11 @@ class TelegramClient {
       $views = $this->MadelineProto->messages->readHistory(['peer' => 1206532903, 'max_id' => 1000]);
       $result['result'] = $views;
     } catch (\Throwable $th) {
-      $users['status'] = 'error';
-      $users['result'] = 'Ошибка ' . $th->getMessage();
+      $result['status'] = 'error';
+      $result['result'] = 'Ошибка ' . $th->getMessage();
     }
     return $result;
+    */
   }
 
   public function getMe() {
@@ -84,7 +117,67 @@ class TelegramClient {
     return $result;
   }
 
-  public function getMassages($peer, $offsetId = 0, $offsetDate = 0, $addOffset = 0, $limit = 200, $maxId = 0, $minId = 0, $hash = []) {
+  public function getMessagesAll($channel, $offsetDate) {
+    $result = [
+      'status' => 'ok',
+      'result' => [
+        'messages' => []
+      ]
+    ];
+    $offset = 0;
+    $limit = 100;
+
+    $offset = 0;
+
+    while (true) {
+      $res = $this->getMassages($channel, $offset, $offsetDate, 0, $limit);
+      
+      if ($res['status'] == 'error') {
+        $result['status'] = $res['status'];
+        $result['result'] = $res['result'];
+        break;
+      }
+
+      $countUsers = count($res['result']['messages']);
+      $result['result']['messages'] = array_merge($result['result']['messages'], $res['result']['messages']);
+
+      if ($countUsers == 0) {
+        break;
+      }
+      $offset += $countUsers;
+    }
+    return $result;
+  }
+
+  public function searchMessages($peer, $q = '', $min_date = 0, $max_date = 0, $offset_id = 0, $add_offset = 0, $limit = 100, $max_id = 0, $min_id = 0, $from_id = ['_' => 'inputUserEmpty'], $filter = ['_' => 'inputMessagesFilterEmpty'], $hash = []) {
+    $result = [
+      'status' => 'ok', 
+      'result' => array()
+    ];
+
+    try {
+      $result['result'] = $this->MadelineProto->messages->search([
+        'peer' => $peer, 
+        'q' => $q, 
+        'from_id' => $from_id, 
+        'filter' => $filter, 
+        'min_date' => $min_date, 
+        'max_date' => $max_date, 
+        'offset_id' => $offset_id, 
+        'add_offset' => $add_offset, 
+        'limit' => $limit, 
+        'max_id' => $max_id, 
+        'min_id' => $min_id,
+        'hash' => $hash
+      ]);
+    } catch (\Throwable $th) {
+      $result['status'] = 'error';
+      $result['result'] = 'Ошибка ' . $th->getMessage();
+    }
+    return $result;
+  }
+
+  public function getMassages($peer, $offsetId = 0, $offsetDate = 0, $addOffset = 0, $limit = 100, $maxId = 0, $minId = 0, $hash = []) {
     $result = [
       'status' => 'ok', 
       'result' => array()
@@ -101,6 +194,26 @@ class TelegramClient {
         'min_id' => $minId,           // Если было передано положительное значение, метод будет возвращать только сообщения с идентификаторами, превышающими min_id
         'hash' => $hash               // Идентификаторы сообщений, которые вы уже получили, необязательный
       ]);
+    } catch (\Throwable $th) {
+      $result['status'] = 'error';
+      $result['result'] = 'Ошибка ' . $th->getMessage();
+    }
+    return $result;
+  }
+
+  function getUsers($id) {
+    //MadelineProto->users->getUsers(['id' => , ]);
+    return $this->MadelineProto->users->getUsers(['id' => $id]);
+  }
+
+  function getInfo($id) {
+    $result = [
+      'status' => 'ok', 
+      'result' => array()
+    ];
+
+    try {
+      $result['result'] = $this->MadelineProto->getInfo($id, false);
     } catch (\Throwable $th) {
       $result['status'] = 'error';
       $result['result'] = 'Ошибка ' . $th->getMessage();
@@ -337,6 +450,57 @@ class TelegramClient {
       }
   
     }
+  }
+
+  function downloadFile($MessageMedia, $dirForPhoto, $fileName, $absolutePath = false) {
+    $result = [
+      'status' => 'ok',
+      'result' => ''
+    ];
+   
+    $photoInfo = $this->MadelineProto->get_download_info($MessageMedia);
+    $photoExtension = $photoInfo['ext'];
+    $fileFullName = $dirForPhoto . $fileName . $photoExtension;
+
+    // если файл существует, то возвращаем путь к нему
+    if (file_exists($fileFullName)) {
+      $result['result'] = $fileFullName;
+      return $result;
+    }
+
+    try {
+
+      $res = $this->MadelineProto->downloadToFile($MessageMedia, $fileFullName);
+      if ($absolutePath) {
+        $result['result'] = $res;
+      } else {
+        $result['result'] = $fileFullName;
+      }
+      
+    } catch (\Throwable $th) {
+      $result['status'] = 'error';
+      $result['result'] = 'Ошибка ' . $th->getMessage();
+    }
+
+    return $result;
+  }
+
+  public function saveToCSV($filename, $headers, $data) {
+    $separate = ';';
+    // open the file or create
+    $file = fopen($filename, 'a');
+    
+    // save the column headers
+    if (filesize($filename) < 1) {
+      fputcsv($file, $headers, $separate);
+    }
+    
+    // save each row of the data
+    foreach ($data as $row) {
+      fputcsv($file, $row, $separate);
+    }
+
+    fclose($file);
   }
 }
 
